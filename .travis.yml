@@ -41,10 +41,11 @@ before_script:
         - test "$TRAVIS_OS_NAME" != osx || export PATH="/usr/local/opt/gettext/bin:$PATH"
         - autoreconf -ivf
         - intltoolize --force
-        - test "$TRAVIS_OS_NAME" != osx || sh ./configure --without-magick --without-pstoedit
+        - aclocal
+        - test "$TRAVIS_OS_NAME" != osx || sh ./configure MAGICK_CFLAGS="--mmacosx-version-min=10.8 $(pkg-config graphicsmagick --cflags)" MAGICK_LIBS="$(pkg-config graphicsmagick --libs)"
         - test "$TRAVIS_OS_NAME" != linux || ./configure
 
 script:
-        - make
+        - env MACOSX_DEPLOYMENT_TARGET=10.8 make
         - LD_LIBRARY_PATH=.libs ldd .libs/autotrace || true 
         - ./autotrace -v

@@ -34,8 +34,9 @@ addons:
 
 before_install:
         - test "$TRAVIS_OS_NAME" != osx || brew update
-        - test "$TRAVIS_OS_NAME" != osx || brew install gettext intltool glib
-
+        - test "$TRAVIS_OS_NAME" != osx || for pkg in gettext intltool glib libtool autoconf automake pkg-config; do brew install $pkg || brew upgrade $pkg; done
+        - test "$TRAVIS_OS_NAME" != osx || brew install imagemagick pstoedit
+        - test "$TRAVIS_OS_NAME" != osx || brew install graphicsmagick            # this one has magick/api.h, it needs MAGIC_* with configure below, sigh.
 
 before_script:
         - test "$TRAVIS_OS_NAME" != osx || export PATH="/usr/local/opt/gettext/bin:$PATH"
@@ -46,6 +47,7 @@ before_script:
         - test "$TRAVIS_OS_NAME" != linux || ./configure
 
 script:
-        - env MACOSX_DEPLOYMENT_TARGET=10.8 make
+        - export MACOSX_DEPLOYMENT_TARGET=10.8
+        - make
         - LD_LIBRARY_PATH=.libs ldd .libs/autotrace || true 
         - ./autotrace -v
